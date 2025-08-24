@@ -34,10 +34,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center">
       <form
         onSubmit={handleLogin}
-        className="bg-white p-8 rounded shadow-md w-full max-w-md"
+        className="bg-zinc-500 p-8 rounded shadow-md w-full max-w-md"
       >
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
@@ -57,6 +57,7 @@ const Login = () => {
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           showToggle
+          secureInput
           required
         />
 
@@ -79,7 +80,7 @@ const Login = () => {
         <div className="mt-4 text-center">
           <p>
             Não tem uma conta?{" "}
-            <a href="/register" className="text-blue-600 hover:underline">
+            <a href="/register" className="text-blue-950 hover:text-blue-500">
               Cadastre-se
             </a>
           </p>
