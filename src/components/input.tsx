@@ -1,30 +1,45 @@
-import { InputHTMLAttributes, useState } from "react";
+import { useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+interface InputProps {
+  type: string;
+  placeholder: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
   showToggle?: boolean;
 }
 
-const Input = ({ label, showToggle, type, ...rest }: InputProps) => {
-  const [visible, setVisible] = useState(false);
+const Input = ({
+  type,
+  placeholder,
+  value,
+  onChange,
+  required = false,
+  showToggle = false,
+}: InputProps) => {
+  const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === "password";
 
+  const inputType = isPassword && showToggle ? (showPassword ? "text" : "password") : type;
+
   return (
-    <div className="relative w-full mb-4">
-      {label && <label className="block mb-1 font-medium">{label}</label>}
+    <div className="relative mb-4">
       <input
-        type={isPassword && showToggle ? (visible ? "text" : "password") : type}
-        className="w-full p-3 border rounded"
-        {...rest}
+        type={inputType}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        required={required}
+        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       {isPassword && showToggle && (
-        <button
-          type="button"
-          onClick={() => setVisible(!visible)}
-          className="absolute right-3 top-3 text-gray-500"
+        <span
+          onClick={() => setShowPassword((prev) => !prev)}
+          className="absolute right-3 top-2.5 text-xl text-gray-600 cursor-pointer"
         >
-          {visible ? "👁️" : "🙈"}
-        </button>
+          {showPassword ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
+        </span>
       )}
     </div>
   );

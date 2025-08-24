@@ -5,20 +5,36 @@ import { auth } from "../../firebase/config";
 import Input from "../components/input";
 import Button from "../components/button";
 import { showAlert } from "../utils/alert";
+import { FirebaseError } from "firebase/app";
+import { registerSchema } from "../utils/validationPassword";
 
 const Register = () => {
-  const [email, setEmail] = useState<string>("");
-  const [senha, setSenha] = useState<string>("");
-  const [confirmacao, setConfirmacao] = useState<string>("");
-  const [erro, setErro] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [confirmacao, setConfirmacao] = useState("");
+  const [erro, setErro] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Validação individual dos critérios
+  const temTamanhoMinimo = senha.length >= 6;
+  const temMaiuscula = /[A-Z]/.test(senha);
+  const temNumero = /\d/.test(senha);
+  const senhaValida = temTamanhoMinimo && temMaiuscula && temNumero;
+  const senhasIguais = senha === confirmacao;
+  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const podeCadastrar = senhaValida && senhasIguais && emailValido;
 
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
+    setErro("");
 
-    if (senha !== confirmacao) {
-      setErro("As senhas não coincidem.");
+    const parsed = registerSchema.safeParse({ email, senha, confirmacao });
+
+    if (!parsed.success) {
+      const mensagem = parsed.error.issues[0]?.message || "Preencha todos os campos corretamente.";
+      setErro(mensagem);
       return;
     }
 
@@ -28,9 +44,14 @@ const Register = () => {
       showAlert("Registro realizado com sucesso!", "success");
       navigate("/login");
     } catch (err) {
-      console.error("Erro ao cadastrar:", err);
-      setErro("Erro ao cadastrar. Verifique os dados.");
-      showAlert("Erro ao cadastrar. Verifique os dados.", "danger");
+      const error = err as FirebaseError;
+      if (error.code === "auth/email-already-in-use") {
+        setErro("Este email já está cadastrado.");
+        showAlert("Este email já está cadastrado.", "danger");
+      } else {
+        setErro("Erro ao cadastrar. Verifique os dados.");
+        showAlert("Erro ao cadastrar. Verifique os dados.", "danger");
+      }
     } finally {
       setLoading(false);
     }
@@ -63,6 +84,18 @@ const Register = () => {
           required
         />
 
+        <div className="mb-4 text-sm space-y-1">
+          <p className={senha ? (temTamanhoMinimo ? "text-green-600" : "text-red-500") : "text-gray-500"}>
+            • Mínimo de 6 caracteres
+          </p>
+          <p className={senha ? (temMaiuscula ? "text-green-600" : "text-red-500") : "text-gray-500"}>
+            • Pelo menos uma letra maiúscula
+          </p>
+          <p className={senha ? (temNumero ? "text-green-600" : "text-red-500") : "text-gray-500"}>
+            • Pelo menos um número
+          </p>
+        </div>
+
         <Input
           type="password"
           placeholder="Confirmar senha"
@@ -74,9 +107,11 @@ const Register = () => {
 
         <div className="flex justify-center">
           <Button
-            className="bg-green-600 hover:bg-green-700"
+            className={`${
+              podeCadastrar ? "bg-green-600 hover:bg-green-700" : "bg-gray-400"
+            }`}
             type="submit"
-            disabled={loading}
+            disabled={loading || !podeCadastrar}
           >
             {loading ? "Cadastrando..." : "Cadastrar"}
           </Button>

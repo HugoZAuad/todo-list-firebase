@@ -14,6 +14,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const podeLogar = email.trim() !== "" && senha.trim() !== "";
+
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -58,8 +60,14 @@ const Login = () => {
           required
         />
 
-        <div className="flex justify-center ">
-          <Button type="submit" disabled={loading}>
+        <div className="flex justify-center">
+          <Button
+            type="submit"
+            disabled={loading || !podeLogar}
+            className={`${
+              podeLogar ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400"
+            }`}
+          >
             {loading ? "Entrando..." : "Entrar"}
           </Button>
         </div>
