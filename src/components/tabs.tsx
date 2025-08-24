@@ -29,7 +29,7 @@ export function Tabs({ tabs, onChange, initialValue }: TabsProps) {
             ${
               activeTab === tab.value
                 ? "border-b-2 border-primary text-primary"
-                : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-white"
+                : "text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-500"
             }
           `}
         >
