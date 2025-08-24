@@ -29,10 +29,11 @@ export function AlertManager() {
     return () => timers.forEach(clearTimeout)
   }, [alerts])
 
+  // Usando classes padrão do Tailwind
   const colorMap = {
-    primary: "bg-primary text-white",
-    success: "bg-success text-white",
-    danger: "bg-danger text-white",
+    primary: "bg-blue-600 text-white",
+    success: "bg-green-500 text-white",
+    danger: "bg-red-500 text-white",
   }
 
   return (
@@ -40,7 +41,7 @@ export function AlertManager() {
       {alerts.map((alert) => (
         <div
           key={alert.id}
-          className={`px-4 py-2 rounded shadow-lg animate-fade-in ${colorMap[alert.type]}`}
+          className={`px-4 py-2 rounded shadow-lg transition-opacity duration-300 ease-in-out animate-fade-in ${colorMap[alert.type]} bg-opacity-100`}
         >
           {alert.message}
         </div>

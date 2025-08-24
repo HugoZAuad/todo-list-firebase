@@ -85,6 +85,9 @@ const Register = () => {
           <p className={senha ? (temNumero ? "text-green-400" : "text-red-400") : "text-white"}>
             • Pelo menos um número
           </p>
+          <p className={senha ? (senhasIguais ? "text-green-400" : "text-red-400") : "text-white"}>
+            • Senha combinando
+          </p>
         </div>
 
         <Input
