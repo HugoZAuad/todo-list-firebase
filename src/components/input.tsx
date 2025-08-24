@@ -1,29 +1,33 @@
-type InputProps = {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-  type?: string;
-  name?: string;
+import { InputHTMLAttributes, useState } from "react";
+
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  showToggle?: boolean;
+}
+
+const Input = ({ label, showToggle, type, ...rest }: InputProps) => {
+  const [visible, setVisible] = useState(false);
+  const isPassword = type === "password";
+
+  return (
+    <div className="relative w-full mb-4">
+      {label && <label className="block mb-1 font-medium">{label}</label>}
+      <input
+        type={isPassword && showToggle ? (visible ? "text" : "password") : type}
+        className="w-full p-3 border rounded"
+        {...rest}
+      />
+      {isPassword && showToggle && (
+        <button
+          type="button"
+          onClick={() => setVisible(!visible)}
+          className="absolute right-3 top-3 text-gray-500"
+        >
+          {visible ? "👁️" : "🙈"}
+        </button>
+      )}
+    </div>
+  );
 };
 
-export default function Input({
-  value,
-  onChange,
-  placeholder = '',
-  type = 'text',
-  name,
-}: InputProps) {
-  return (
-    <input
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      type={type}
-      name={name}
-      className="w-full px-3 py-2 border rounded
-        bg-light-card text-light-text border-light-border
-        dark:bg-dark-card dark:text-dark-text dark:border-dark-border
-        focus:outline-none focus:ring-2 focus:ring-primary transition"
-    />
-  );
-}
+export default Input;

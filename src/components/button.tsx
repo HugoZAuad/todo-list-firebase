@@ -1,26 +1,24 @@
-type ButtonProps = {
-  label: string;
+interface ButtonProps {
+  children: React.ReactNode;
   onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
+  type?: "button" | "submit";
   disabled?: boolean;
   className?: string;
-};
+}
 
-export default function Button({
-  label,
-  onClick,
-  type = 'button',
-  disabled = false,
-  className = '',
-}: ButtonProps) {
+const Button = ({ children, onClick, type = "button", disabled, className }: ButtonProps) => {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`px-4 py-2 rounded transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`py-2 px-4 rounded text-white ${
+        disabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+      } ${className}`}
     >
-      {label}
+      {children}
     </button>
   );
-}
+};
+
+export default Button;

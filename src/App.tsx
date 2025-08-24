@@ -1,12 +1,27 @@
-import Button from "./components/button";
-import { ToggleTheme } from "./components/toggleTheme";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./pages/login";
+import Register from "./pages/register";
+import  PrivateRoute from "./routes/routePrivate";
+import { AlertManager } from "./components/alertManager";
 
-export default function App() {
+const App = () => {
   return (
-    <div>
-      <Button label={"Clique aqui"} />
-      Teste: Tailwind está funcionando! 💙
-      <ToggleTheme />
-    </div>
+    <Router>
+        <AlertManager />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/tarefas"
+          element={
+            <PrivateRoute children={undefined}>
+            </PrivateRoute>
+          }
+        />
+        <Route path="*" element={<Login />} />
+      </Routes>
+    </Router>
   );
-}
+};
+
+export default App;
