@@ -1,7 +1,12 @@
+import Button from "./components/button";
+import { ToggleTheme } from "./components/toggleTheme";
+
 export default function App() {
   return (
-    <div className="bg-blue-600 text-white p-3 rounded">
+    <div>
+      <Button label={"Clique aqui"} />
       Teste: Tailwind está funcionando! 💙
+      <ToggleTheme />
     </div>
   );
 }
