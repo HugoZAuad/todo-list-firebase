@@ -10,15 +10,9 @@ import {
   deleteTask,
   getTasks,
   updateTask,
+  Task,
 } from "../services/taskService"
 import { onAuthStateChanged } from "firebase/auth"
-
-interface Task {
-  id: string
-  title: string
-  status: "pendente" | "concluido" | "excluido"
-  editMode?: boolean
-}
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -31,7 +25,7 @@ export default function Tasks() {
         setUid(user.uid)
         try {
           const data = await getTasks(user.uid)
-          setTasks(data as Task[])
+          setTasks(data || [])
         } catch (error) {
           console.error("Erro ao buscar tarefas:", error)
         }
@@ -53,7 +47,7 @@ export default function Tasks() {
     try {
       const doc = await createTask(uid, { title: "", status: "pendente" })
       const newTask: Task = {
-        id: doc.at(-1) || "",
+        id: doc.id,
         title: "",
         status: "pendente",
         editMode: true,
@@ -124,21 +118,27 @@ export default function Tasks() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {filteredTasks.map((task) => (
-            <Card
-              key={task.id}
-              className="transition-transform duration-300 animate-fade-in bg-zinc-800 text-white"
-            >
-              <TaskItem
-                task={task}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onToggleStatus={handleToggleStatus}
-              />
-            </Card>
-          ))}
-        </div>
+        {filteredTasks.length === 0 ? (
+          <p className="text-center text-zinc-400 mt-10">
+            Nenhuma tarefa encontrada.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {filteredTasks.map((task) => (
+              <Card
+                key={task.id}
+                className="transition-transform duration-300 animate-fade-in bg-zinc-800 text-white"
+              >
+                <TaskItem
+                  task={task}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onToggleStatus={handleToggleStatus}
+                />
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

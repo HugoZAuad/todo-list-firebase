@@ -12,11 +12,11 @@ import {
 export type Task = {
   id: string
   title: string
-  status: "pendente" | "concluido"
+  status: "pendente" | "concluido" | "excluido"
   uid?: string
+  editMode?: boolean
 }
 
-// 🔹 Cria uma nova tarefa
 export const createTask = async (
   uid: string,
   task: { title: string; status: "pendente" | "concluido" }
@@ -29,7 +29,6 @@ export const createTask = async (
   return docRef
 }
 
-// 🔹 Lista todas as tarefas de um usuário
 export const getTasks = async (uid: string): Promise<Task[]> => {
   const userTasksRef = collection(db, "users", uid, "tasks")
   const snapshot = await getDocs(userTasksRef)
@@ -40,7 +39,6 @@ export const getTasks = async (uid: string): Promise<Task[]> => {
   return tasks
 }
 
-// 🔹 Atualiza uma tarefa existente
 export const updateTask = async (
   uid: string,
   taskId: string,
@@ -50,7 +48,6 @@ export const updateTask = async (
   await updateDoc(taskRef, updates)
 }
 
-// 🔹 Remove uma tarefa
 export const deleteTask = async (uid: string, taskId: string): Promise<void> => {
   const taskRef = doc(db, "users", uid, "tasks", taskId)
   await deleteDoc(taskRef)

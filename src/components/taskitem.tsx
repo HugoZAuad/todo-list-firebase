@@ -1,99 +1,46 @@
-import React, { useEffect, useState } from "react"
-import {
-  createTask,
-  getTasks,
-  updateTask,
-  deleteTask,
-  Task,
-} from "../services/taskService"
+// src/components/TaskItem.tsx
+import React from "react"
+import { Task } from "../services/taskService"
 
 type Props = {
-  uid: string
+  task: Task
+  onEdit: (id: string, title: string) => void
+  onDelete: (id: string) => void
+  onToggleStatus: (id: string) => void
 }
 
-const TaskList: React.FC<Props> = ({ uid }) => {
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [newTitle, setNewTitle] = useState("")
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const data = await getTasks(uid)
-        setTasks(data || [])
-      } catch (error) {
-        console.error("Erro ao buscar tarefas:", error)
-      }
-    }
-    fetchTasks()
-  }, [uid])
-
-  // 🔹 Cria nova tarefa
-  const handleCreate = async () => {
-    if (!newTitle.trim()) return
-    try {
-      const docRef = await createTask(uid, {
-        title: newTitle,
-        status: "pendente",
-      })
-      const newTask: Task = {
-        id: docRef.id,
-        title: newTitle,
-        status: "pendente",
-      }
-      setTasks((prev) => [...prev, newTask])
-      setNewTitle("")
-    } catch (error) {
-      console.error("Erro ao criar tarefa:", error)
-    }
-  }
-
-  // 🔹 Edita tarefa existente
-  const handleEdit = async (id: string, title: string) => {
-    try {
-      await updateTask(uid, id, { title })
-      setTasks((prev) =>
-        prev.map((task) => (task.id === id ? { ...task, title } : task))
-      )
-    } catch (error) {
-      console.error("Erro ao editar tarefa:", error)
-    }
-  }
-
-  // 🔹 Remove tarefa
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteTask(uid, id)
-      setTasks((prev) => prev.filter((task) => task.id !== id))
-    } catch (error) {
-      console.error("Erro ao deletar tarefa:", error)
-    }
-  }
-
+export const TaskItem: React.FC<Props> = ({
+  task,
+  onEdit,
+  onDelete,
+  onToggleStatus,
+}) => {
   return (
-    <div>
-      <h2>Minhas Tarefas</h2>
+    <div className="space-y-2">
       <input
         type="text"
-        value={newTitle}
-        onChange={(e) => setNewTitle(e.target.value)}
-        placeholder="Nova tarefa"
+        value={task.title}
+        onChange={(e) => onEdit(task.id, e.target.value)}
+        className="w-full px-2 py-1 rounded bg-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
-      <button onClick={handleCreate}>Criar</button>
-
-      <ul>
-        {tasks.map((task) => (
-          <li key={task.id}>
-            <input
-              type="text"
-              value={task.title}
-              onChange={(e) => handleEdit(task.id, e.target.value)}
-            />
-            <button onClick={() => handleDelete(task.id)}>🗑️</button>
-          </li>
-        ))}
-      </ul>
+      <div className="flex justify-between items-center">
+        <button
+          onClick={() => onToggleStatus(task.id)}
+          className={`px-2 py-1 rounded text-sm ${
+            task.status === "concluido"
+              ? "bg-green-600 hover:bg-green-700"
+              : "bg-yellow-600 hover:bg-yellow-700"
+          }`}
+        >
+          {task.status === "concluido" ? "Concluída" : "Pendente"}
+        </button>
+        <button
+          onClick={() => onDelete(task.id)}
+          className="text-red-400 hover:text-red-600"
+        >
+          🗑️
+        </button>
+      </div>
     </div>
   )
 }
-
-export default TaskList
