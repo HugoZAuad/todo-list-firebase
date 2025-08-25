@@ -1,53 +1,57 @@
+import { db } from "../../firebase/config"
 import {
   collection,
+  doc,
   addDoc,
   getDocs,
   updateDoc,
   deleteDoc,
-  doc,
+  DocumentReference,
 } from "firebase/firestore"
-import { db } from "../../firebase/config"
-
-export type TaskStatus = "pendente" | "concluido"
 
 export type Task = {
-  id?: string
+  id: string
   title: string
-  status: TaskStatus
-  uid: string
+  status: "pendente" | "concluido"
+  uid?: string
 }
 
+// 🔹 Cria uma nova tarefa
 export const createTask = async (
   uid: string,
-  task: { title: string; status: TaskStatus }
-) => {
+  task: { title: string; status: "pendente" | "concluido" }
+): Promise<DocumentReference> => {
   const userTasksRef = collection(db, "users", uid, "tasks")
   const docRef = await addDoc(userTasksRef, {
     ...task,
     uid,
   })
-  return docRef.id
+  return docRef
 }
 
+// 🔹 Lista todas as tarefas de um usuário
 export const getTasks = async (uid: string): Promise<Task[]> => {
   const userTasksRef = collection(db, "users", uid, "tasks")
   const snapshot = await getDocs(userTasksRef)
-  return snapshot.docs.map((doc) => ({
+  const tasks: Task[] = snapshot.docs.map((doc) => ({
     id: doc.id,
     ...(doc.data() as Omit<Task, "id">),
   }))
+  return tasks
 }
 
+// 🔹 Atualiza uma tarefa existente
 export const updateTask = async (
   uid: string,
   taskId: string,
-  updatedTask: Partial<Omit<Task, "id" | "uid">>
-) => {
+  updates: Partial<Omit<Task, "id">>
+): Promise<void> => {
   const taskRef = doc(db, "users", uid, "tasks", taskId)
-  await updateDoc(taskRef, updatedTask)
+  await updateDoc(taskRef, updates)
 }
 
-export const deleteTask = async (uid: string, taskId: string) => {
+// 🔹 Remove uma tarefa
+export const deleteTask = async (uid: string, taskId: string): Promise<void> => {
   const taskRef = doc(db, "users", uid, "tasks", taskId)
   await deleteDoc(taskRef)
 }
