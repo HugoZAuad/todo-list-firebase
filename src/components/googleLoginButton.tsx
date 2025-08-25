@@ -32,7 +32,7 @@ export default function GoogleLoginButton({ disabled }: Props) {
 
   return (
     <Button
-      className="bg-red-600 hover:bg-red-700 w-full"
+      className="bg-red-600 hover:bg-red-700 w-3/6"
       onClick={handleGoogleLogin}
       disabled={disabled}
     >

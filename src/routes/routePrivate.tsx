@@ -1,19 +1,25 @@
-import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase/config";
+import { ReactNode } from "react"
+import { Navigate } from "react-router-dom"
+import { useAuthState } from "react-firebase-hooks/auth"
+import { auth } from "../../firebase/config"
+import { LoadingSpinner } from "../components/loadingSpinner" 
 
 interface PrivateRouteProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 const PrivateRoute = ({ children }: PrivateRouteProps) => {
-  const [user, loading] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth)
 
-  if (loading) return <p>Carregando...</p>;
-  if (!user) return <Navigate to="/login" />;
+  if (loading) return (
+    <div className="h-screen flex justify-center items-center">
+      <LoadingSpinner />
+    </div>
+  )
 
-  return <>{children}</>;
-};
+  if (!user) return <Navigate to="/login" />
 
-export default PrivateRoute;
+  return <>{children}</>
+}
+
+export default PrivateRoute

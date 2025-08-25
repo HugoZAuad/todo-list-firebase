@@ -77,16 +77,16 @@ const Register = () => {
 
         <div className="mb-4 text-sm space-y-1">
           <p className={senha ? (temTamanhoMinimo ? "text-green-400 " : "text-red-400") : "text-white"}>
-            • Mínimo de 6 caracteres
+            • Deve ter no mínimo de 6 caracteres
           </p>
           <p className={senha ? (temMaiuscula ? "text-green-400" : "text-red-400") : "text-white"}>
-            • Pelo menos uma letra maiúscula
+            •  Deve ter pelo menos uma letra maiúscula
           </p>
           <p className={senha ? (temNumero ? "text-green-400" : "text-red-400") : "text-white"}>
-            • Pelo menos um número
+            • Deve ter pelo menos um número
           </p>
           <p className={senha ? (senhasIguais ? "text-green-400" : "text-red-400") : "text-white"}>
-            • Senha combinando
+            • As senhas devem ser iguais
           </p>
         </div>
 
