@@ -15,23 +15,17 @@ type Props = {
 const TaskList: React.FC<Props> = ({ uid }) => {
   const [tasks, setTasks] = useState<Task[]>([])
   const [newTitle, setNewTitle] = useState("")
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchTasks = async () => {
-      console.log("UID recebido:", uid)
       try {
         const data = await getTasks(uid)
-        console.log("Tarefas carregadas:", data)
         setTasks(data || [])
       } catch (error) {
         console.error("Erro ao buscar tarefas:", error)
-      } finally {
-        setLoading(false)
       }
     }
-
-    if (uid) fetchTasks()
+    fetchTasks()
   }, [uid])
 
   const handleCreate = async () => {
@@ -41,13 +35,11 @@ const TaskList: React.FC<Props> = ({ uid }) => {
         title: newTitle,
         status: "pendente",
       })
-
       const newTask: Task = {
         id: docRef.id,
         title: newTitle,
         status: "pendente",
       }
-
       setTasks((prev) => [...prev, newTask])
       setNewTitle("")
     } catch (error) {
@@ -66,24 +58,6 @@ const TaskList: React.FC<Props> = ({ uid }) => {
     }
   }
 
-  const handleToggleStatus = async (id: string) => {
-    const task = tasks.find((t) => t.id === id)
-    if (!task) return
-
-    const newStatus = task.status === "concluída" ? "pendente" : "concluída"
-
-    try {
-      await updateTask(uid, id, { status: newStatus })
-      setTasks((prev) =>
-        prev.map((t) =>
-          t.id === id ? { ...t, status: newStatus } : t
-        )
-      )
-    } catch (error) {
-      console.error("Erro ao atualizar status:", error)
-    }
-  }
-
   const handleDelete = async (id: string) => {
     try {
       await deleteTask(uid, id)
@@ -92,8 +66,6 @@ const TaskList: React.FC<Props> = ({ uid }) => {
       console.error("Erro ao deletar tarefa:", error)
     }
   }
-
-  if (loading) return <p className="text-center mt-10">Carregando tarefas...</p>
 
   return (
     <div className="max-w-md mx-auto mt-10 p-5 bg-gray-100 rounded shadow">
@@ -115,14 +87,14 @@ const TaskList: React.FC<Props> = ({ uid }) => {
         </button>
       </div>
 
-      <ul className="space-y-4">
+      <ul>
         {tasks.map((task) => (
           <TaskItem
             key={task.id}
             task={task}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            onToggleStatus={handleToggleStatus}
+            onToggleStatus={() => {}}
           />
         ))}
       </ul>
