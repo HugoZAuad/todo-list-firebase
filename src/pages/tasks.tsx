@@ -6,7 +6,6 @@ import {
   updateDoc,
   deleteDoc,
   doc,
-  getDoc,
 } from "firebase/firestore"
 import { db } from "../../firebase/config"
 
@@ -25,7 +24,6 @@ export default function Tasks({ uid }: { uid: string }) {
     alert(`${type === "success" ? "✅" : "❌"} ${msg}`)
   }
 
-  // 🔄 Carregar tarefas
   const fetchTasks = useCallback(async () => {
     setLoading(true)
     try {
@@ -44,7 +42,6 @@ export default function Tasks({ uid }: { uid: string }) {
     }
   }, [uid])
 
-  // ➕ Criar tarefa
   const createTask = async () => {
     try {
       const userTasksRef = collection(db, "users", uid, "tasks")
@@ -52,15 +49,11 @@ export default function Tasks({ uid }: { uid: string }) {
         title: "",
         status: "pendente",
       })
-      const snapshot = await getDoc(docRef)
-      const data = snapshot.data()
-
-      if (!data) throw new Error("Erro ao obter dados da nova tarefa")
 
       const newTask: Task = {
         id: docRef.id,
-        title: data.title,
-        status: data.status,
+        title: "",
+        status: "pendente",
         editMode: true,
       }
 
@@ -72,7 +65,6 @@ export default function Tasks({ uid }: { uid: string }) {
     }
   }
 
-  // ✏️ Atualizar tarefa
   const updateTask = async (task: Task) => {
     try {
       const taskRef = doc(db, "users", uid, "tasks", task.id)
@@ -87,7 +79,6 @@ export default function Tasks({ uid }: { uid: string }) {
     }
   }
 
-  // 🗑️ Excluir tarefa
   const deleteTask = async (id: string) => {
     try {
       const taskRef = doc(db, "users", uid, "tasks", id)
@@ -158,7 +149,7 @@ export default function Tasks({ uid }: { uid: string }) {
               </>
             ) : (
               <>
-                <strong>{task.title}</strong> — {task.status}
+                <strong>{task.title || "(sem título)"}</strong> — {task.status}
                 <button
                   onClick={() =>
                     setTasks((prev) =>
