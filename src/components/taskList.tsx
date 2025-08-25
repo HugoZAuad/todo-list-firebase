@@ -35,11 +35,13 @@ const TaskList: React.FC<Props> = ({ uid }) => {
         title: newTitle,
         status: "pendente",
       })
+
       const newTask: Task = {
         id: docRef.id,
         title: newTitle,
         status: "pendente",
       }
+
       setTasks((prev) => [...prev, newTask])
       setNewTitle("")
     } catch (error) {
@@ -61,11 +63,15 @@ const TaskList: React.FC<Props> = ({ uid }) => {
   const handleToggleStatus = async (id: string) => {
     const task = tasks.find((t) => t.id === id)
     if (!task) return
+
     const newStatus = task.status === "concluido" ? "pendente" : "concluido"
+
     try {
       await updateTask(uid, id, { status: newStatus })
       setTasks((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, status: newStatus } : t))
+        prev.map((t) =>
+          t.id === id ? { ...t, status: newStatus } : t
+        )
       )
     } catch (error) {
       console.error("Erro ao atualizar status:", error)
