@@ -1,4 +1,3 @@
-// src/components/TaskItem.tsx
 import React from "react"
 import { Task } from "../services/taskService"
 

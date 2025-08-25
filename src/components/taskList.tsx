@@ -1,4 +1,3 @@
-// src/components/TaskList.tsx
 import React, { useEffect, useState } from "react"
 import {
   createTask,
@@ -59,6 +58,22 @@ const TaskList: React.FC<Props> = ({ uid }) => {
     }
   }
 
+  const handleToggleStatus = async (id: string) => {
+    const task = tasks.find((t) => t.id === id)
+    if (!task) return
+    const newStatus = task.status === "concluido" ? "pendente" : "concluido"
+    try {
+      await updateTask(uid, id, { status: newStatus })
+      setTasks((prev) =>
+        prev.map((t) =>
+          t.id === id ? { ...t, status: newStatus } : t
+        )
+      )
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error)
+    }
+  }
+
   const handleDelete = async (id: string) => {
     try {
       await deleteTask(uid, id)
@@ -88,14 +103,14 @@ const TaskList: React.FC<Props> = ({ uid }) => {
         </button>
       </div>
 
-      <ul>
+      <ul className="space-y-4">
         {tasks.map((task) => (
           <TaskItem
             key={task.id}
             task={task}
             onEdit={handleEdit}
             onDelete={handleDelete}
-            onToggleStatus={() => {}}
+            onToggleStatus={handleToggleStatus}
           />
         ))}
       </ul>
