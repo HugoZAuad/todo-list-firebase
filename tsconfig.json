@@ -6,6 +6,7 @@
     "types": ["vite/client", "react", "react-dom", "firebase"],
     "module": "ESNext",
     "target": "ESNext",
+    "noImplicitAny": false,
     "jsx": "react-jsx",
     "strict": true,
     "baseUrl": "./",

@@ -1,6 +1,5 @@
 import { defineConfig } from "vite"
 import path from "path"
-// @ts-expect-error: plugin-react não resolve tipos com moduleResolution: node
 import react from "@vitejs/plugin-react"
 
 export default defineConfig({
