@@ -65,9 +65,7 @@ const TaskList: React.FC<Props> = ({ uid }) => {
     try {
       await updateTask(uid, id, { status: newStatus })
       setTasks((prev) =>
-        prev.map((t) =>
-          t.id === id ? { ...t, status: newStatus } : t
-        )
+        prev.map((t) => (t.id === id ? { ...t, status: newStatus } : t))
       )
     } catch (error) {
       console.error("Erro ao atualizar status:", error)
