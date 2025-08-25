@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
+import { getAuth } from "firebase/auth"
 import Login from "./pages/login"
 import Register from "./pages/register"
 import Tasks from "./pages/tasks"
@@ -6,23 +7,27 @@ import PrivateRoute from "./routes/routePrivate"
 import { AlertManager } from "./components/alertManager"
 
 const App = () => {
+  const auth = getAuth()
+  const user = auth.currentUser
+  const uid = user?.uid || ""
+
   return (
     <Router>
       <AlertManager />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        
+
         <Route
           path="/tarefas"
           element={
             <PrivateRoute>
-              <Tasks />
+              <Tasks uid={uid} />
             </PrivateRoute>
           }
         />
 
-        <Route path="*" element={<Login />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   )

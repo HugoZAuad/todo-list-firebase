@@ -15,17 +15,23 @@ type Props = {
 const TaskList: React.FC<Props> = ({ uid }) => {
   const [tasks, setTasks] = useState<Task[]>([])
   const [newTitle, setNewTitle] = useState("")
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchTasks = async () => {
+      console.log("UID recebido:", uid)
       try {
         const data = await getTasks(uid)
+        console.log("Tarefas carregadas:", data)
         setTasks(data || [])
       } catch (error) {
         console.error("Erro ao buscar tarefas:", error)
+      } finally {
+        setLoading(false)
       }
     }
-    fetchTasks()
+
+    if (uid) fetchTasks()
   }, [uid])
 
   const handleCreate = async () => {
@@ -86,6 +92,8 @@ const TaskList: React.FC<Props> = ({ uid }) => {
       console.error("Erro ao deletar tarefa:", error)
     }
   }
+
+  if (loading) return <p className="text-center mt-10">Carregando tarefas...</p>
 
   return (
     <div className="max-w-md mx-auto mt-10 p-5 bg-gray-100 rounded shadow">
