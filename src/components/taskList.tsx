@@ -64,7 +64,7 @@ const TaskList: React.FC<Props> = ({ uid }) => {
     const task = tasks.find((t) => t.id === id)
     if (!task) return
 
-    const newStatus = task.status === "concluido" ? "pendente" : "concluido"
+    const newStatus = task.status === "concluída" ? "pendente" : "concluída"
 
     try {
       await updateTask(uid, id, { status: newStatus })

@@ -1,54 +1,48 @@
-import { db } from "../../firebase/config"
+
 import {
   collection,
-  doc,
   addDoc,
   getDocs,
   updateDoc,
   deleteDoc,
-  DocumentReference,
+  doc,
 } from "firebase/firestore"
+import { db } from "../../firebase/config"
 
-export type Task = {
+export interface Task {
   id: string
   title: string
-  status: "pendente" | "concluido" | "excluido"
-  uid?: string
-  editMode?: boolean
-}
-
-export const createTask = async (
-  uid: string,
-  task: { title: string; status: "pendente" | "concluido" }
-): Promise<DocumentReference> => {
-  const userTasksRef = collection(db, "users", uid, "tasks")
-  const docRef = await addDoc(userTasksRef, {
-    ...task,
-    uid,
-  })
-  return docRef
+  status: "pendente" | "concluída"
 }
 
 export const getTasks = async (uid: string): Promise<Task[]> => {
   const userTasksRef = collection(db, "users", uid, "tasks")
   const snapshot = await getDocs(userTasksRef)
-  const tasks: Task[] = snapshot.docs.map((doc) => ({
+  return snapshot.docs.map((doc) => ({
     id: doc.id,
     ...(doc.data() as Omit<Task, "id">),
   }))
-  return tasks
+}
+
+export const createTask = async (
+  uid: string,
+  task: Omit<Task, "id">
+): Promise<{ id: string }> => {
+  const userTasksRef = collection(db, "users", uid, "tasks")
+  const docRef = await addDoc(userTasksRef, task)
+  return { id: docRef.id }
 }
 
 export const updateTask = async (
   uid: string,
-  taskId: string,
+  id: string,
   updates: Partial<Omit<Task, "id">>
 ): Promise<void> => {
-  const taskRef = doc(db, "users", uid, "tasks", taskId)
+  const taskRef = doc(db, "users", uid, "tasks", id)
   await updateDoc(taskRef, updates)
 }
 
-export const deleteTask = async (uid: string, taskId: string): Promise<void> => {
-  const taskRef = doc(db, "users", uid, "tasks", taskId)
+export const deleteTask = async (uid: string, id: string): Promise<void> => {
+  const taskRef = doc(db, "users", uid, "tasks", id)
   await deleteDoc(taskRef)
 }

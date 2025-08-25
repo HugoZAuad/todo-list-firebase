@@ -26,12 +26,12 @@ export const TaskItem: React.FC<Props> = ({
         <button
           onClick={() => onToggleStatus(task.id)}
           className={`px-2 py-1 rounded text-sm ${
-            task.status === "concluido"
+            task.status === "concluída"
               ? "bg-green-600 hover:bg-green-700"
               : "bg-yellow-600 hover:bg-yellow-700"
           }`}
         >
-          {task.status === "concluido" ? "Concluída" : "Pendente"}
+          {task.status === "concluída" ? "Concluída" : "Pendente"}
         </button>
         <button
           onClick={() => onDelete(task.id)}
