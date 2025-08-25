@@ -2,12 +2,14 @@ import { useState } from "react"
 import Navbar from "../components/navbar"
 import { Card } from "../components/card"
 import Button from "../components/button"
-import TaskItem from "../components/taskitem"
+import {TaskItem} from "../components/taskitem"
+import { showAlert } from "../utils/alert"
 
 interface Task {
   id: string
   title: string
   status: "pendente" | "concluido" | "excluido"
+  editMode?: boolean 
 }
 
 export default function Tasks() {
@@ -22,21 +24,45 @@ export default function Tasks() {
   const handleCreate = () => {
     const newTask: Task = {
       id: crypto.randomUUID(),
-      title: "Nova tarefa",
+      title: "",
       status: "pendente",
+      editMode: true, 
     }
     setTasks((prev) => [...prev, newTask])
+    showAlert("Tarefa criada com sucesso!", "success")
   }
 
   const handleEdit = (id: string, newTitle: string) => {
     setTasks((prev) =>
-      prev.map((task) => (task.id === id ? { ...task, title: newTitle } : task))
+      prev.map((task) =>
+        task.id === id
+          ? { ...task, title: newTitle, editMode: false } 
+          : task
+      )
     )
   }
 
   const handleDelete = (id: string) => {
     setTasks((prev) =>
-      prev.map((task) => (task.id === id ? { ...task, status: "excluido" } : task))
+      prev.map((task) =>
+        task.id === id ? { ...task, status: "excluido" } : task
+      )
+    )
+    showAlert("Tarefa excluída com sucesso!", "danger")
+  }
+
+  const handleToggleStatus = (id: string) => {
+    setTasks((prev: Task[]) =>
+      prev.map((task: Task) => {
+        if (task.id === id) {
+          const novoStatus = task.status === "concluido" ? "pendente" : "concluido"
+          if (novoStatus === "concluido") {
+            showAlert(`Tarefa "${task.title}" concluída com sucesso!`, "success")
+          }
+          return { ...task, status: novoStatus }
+        }
+        return task
+      })
     )
   }
 
@@ -46,9 +72,12 @@ export default function Tasks() {
 
       <div className="max-w-3xl mx-auto py-8 px-4">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-zinc-400">Minhas Tarefas</h2>
-          <Button onClick={handleCreate} className="bg-blue-600 hover:bg-blue-700">
-            Nova Tarefa
+          <h2 className="text-xl font-bold text-zinc-300 dark:text-white">Minhas Tarefas</h2>
+          <Button
+            onClick={handleCreate}
+            className="bg-zinc-600 hover:bg-zinc-700"
+          >
+            Adicionar Tarefa
           </Button>
         </div>
 
@@ -59,6 +88,7 @@ export default function Tasks() {
                 task={task}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onToggleStatus={handleToggleStatus}
               />
             </Card>
           ))}

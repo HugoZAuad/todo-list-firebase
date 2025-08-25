@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
 
 interface Alert {
-  id: number
+  id: string
   message: string
-  type: "primary" | "success" | "danger"
+  type: "primary" | "success" | "danger" | "warning" | "info"
 }
 
 export function AlertManager() {
@@ -11,7 +11,8 @@ export function AlertManager() {
 
   useEffect(() => {
     const handler = (e: CustomEvent<Alert>) => {
-      setAlerts((prev) => [...prev, { ...e.detail, id: Date.now() }])
+      const newAlert = { ...e.detail, id: crypto.randomUUID() }
+      setAlerts((prev) => [...prev, newAlert])
     }
 
     window.addEventListener("alert", handler as EventListener)
@@ -29,19 +30,20 @@ export function AlertManager() {
     return () => timers.forEach(clearTimeout)
   }, [alerts])
 
-  // Usando classes padrão do Tailwind
-  const colorMap = {
+  const colorMap: Record<Alert["type"], string> = {
     primary: "bg-blue-600 text-white",
     success: "bg-green-500 text-white",
     danger: "bg-red-500 text-white",
+    warning: "bg-yellow-500 text-black",
+    info: "bg-cyan-500 text-white",
   }
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 items-end">
       {alerts.map((alert) => (
         <div
           key={alert.id}
-          className={`px-4 py-2 rounded shadow-lg transition-opacity duration-300 ease-in-out animate-fade-in ${colorMap[alert.type]} bg-opacity-100`}
+          className={`px-4 py-2 rounded shadow-lg transition-all duration-300 ease-in-out animate-fade-in ${colorMap[alert.type]} bg-opacity-95`}
         >
           {alert.message}
         </div>
