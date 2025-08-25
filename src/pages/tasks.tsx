@@ -69,10 +69,9 @@ export default function Tasks() {
   return (
     <div className="min-h-screen">
       <Navbar onChange={(filtro) => setFilter(filtro)} />
-
       <div className="max-w-3xl mx-auto py-8 px-4">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-zinc-300 dark:text-white">Minhas Tarefas</h2>
+          <h2 className="text-xl font-bold text-zinc-100 dark:text-white">Minhas Tarefas</h2>
           <Button
             onClick={handleCreate}
             className="bg-zinc-600 hover:bg-zinc-700"

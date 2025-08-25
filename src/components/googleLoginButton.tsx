@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
 import { auth } from "../../firebase/config"
 import { useNavigate } from "react-router-dom"
@@ -10,12 +11,21 @@ interface Props {
 }
 
 export default function GoogleLoginButton({ disabled }: Props) {
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleGoogleLogin = async () => {
     try {
+      setLoading(true)
+      showAlert("Conectando com Google...", "primary") 
+
       const provider = new GoogleAuthProvider()
+      provider.setCustomParameters({
+        prompt: "select_account", 
+      })
+
       await signInWithPopup(auth, provider)
+
       showAlert("Login com Google realizado com sucesso!", "success")
       navigate("/tarefas")
     } catch (error) {
@@ -27,6 +37,8 @@ export default function GoogleLoginButton({ disabled }: Props) {
         console.error("Erro ao logar com Google:", firebaseError)
         showAlert("Erro ao logar com Google.", "danger")
       }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -34,9 +46,9 @@ export default function GoogleLoginButton({ disabled }: Props) {
     <Button
       className="bg-red-600 hover:bg-red-700 w-3/6"
       onClick={handleGoogleLogin}
-      disabled={disabled}
+      disabled={disabled || loading}
     >
-      Entrar com Google
+      {loading ? "Conectando..." : "Entrar com Google"}
     </Button>
   )
 }
