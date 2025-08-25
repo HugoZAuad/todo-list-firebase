@@ -25,6 +25,7 @@ export default function Tasks({ uid }: { uid: string }) {
   }
 
   const fetchTasks = useCallback(async () => {
+    if (!uid) return
     setLoading(true)
     try {
       const userTasksRef = collection(db, "users", uid, "tasks")
@@ -43,18 +44,24 @@ export default function Tasks({ uid }: { uid: string }) {
   }, [uid])
 
   const createTask = async () => {
+    const title = prompt("Digite o título da nova tarefa:")
+    if (!title || !title.trim()) {
+      showAlert("Título inválido", "error")
+      return
+    }
+
     try {
       const userTasksRef = collection(db, "users", uid, "tasks")
       const docRef = await addDoc(userTasksRef, {
-        title: "",
+        title: title.trim(),
         status: "pendente",
       })
 
       const newTask: Task = {
         id: docRef.id,
-        title: "",
+        title: title.trim(),
         status: "pendente",
-        editMode: true,
+        editMode: false,
       }
 
       setTasks((prev) => [...prev, newTask])
@@ -95,7 +102,8 @@ export default function Tasks({ uid }: { uid: string }) {
     if (uid) fetchTasks()
   }, [uid, fetchTasks])
 
-  if (loading) return <p>Carregando tarefas...</p>
+  if (!uid) return <p>⚠️ UID não fornecido. Não é possível carregar tarefas.</p>
+  if (loading) return <p>⏳ Carregando tarefas...</p>
 
   return (
     <div>
