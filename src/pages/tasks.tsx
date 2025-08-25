@@ -1,145 +1,181 @@
-import { useEffect, useState } from "react"
-import Navbar from "../components/navbar"
-import { Card } from "../components/card"
-import Button from "../components/button"
-import { TaskItem } from "../components/taskitem"
-import { showAlert } from "../utils/alert"
-import { auth } from "../../firebase/config"
+import { useEffect, useState, useCallback } from "react"
 import {
-  createTask,
-  deleteTask,
-  getTasks,
-  updateTask,
-  Task,
-} from "../services/taskService"
-import { onAuthStateChanged } from "firebase/auth"
+  collection,
+  addDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  doc,
+  getDoc,
+} from "firebase/firestore"
+import { db } from "../../firebase/config"
 
-export default function Tasks() {
+interface Task {
+  id: string
+  title: string
+  status: "pendente" | "concluída"
+  editMode?: boolean
+}
+
+export default function Tasks({ uid }: { uid: string }) {
   const [tasks, setTasks] = useState<Task[]>([])
-  const [filter, setFilter] = useState("todos")
-  const [uid, setUid] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setUid(user.uid)
-        try {
-          const data = await getTasks(user.uid)
-          setTasks(data || [])
-        } catch (error) {
-          console.error("Erro ao buscar tarefas:", error)
-        }
-      } else {
-        setUid(null)
-        setTasks([])
-      }
-    })
-    return () => unsubscribe()
-  }, [])
+  const showAlert = (msg: string, type: "success" | "error") => {
+    alert(`${type === "success" ? "✅" : "❌"} ${msg}`)
+  }
 
-  const filteredTasks = tasks.filter((task) => {
-    if (filter === "todos") return task.status !== "excluido"
-    return task.status === filter
-  })
-
-  const handleCreate = async () => {
-    if (!uid) return
+  // 🔄 Carregar tarefas
+  const fetchTasks = useCallback(async () => {
+    setLoading(true)
     try {
-      const doc = await createTask(uid, { title: "", status: "pendente" })
-      const newTask: Task = {
+      const userTasksRef = collection(db, "users", uid, "tasks")
+      const snapshot = await getDocs(userTasksRef)
+      const loadedTasks: Task[] = snapshot.docs.map((doc) => ({
         id: doc.id,
+        ...(doc.data() as Omit<Task, "id">),
+      }))
+      setTasks(loadedTasks)
+    } catch (error) {
+      console.error("Erro ao buscar tarefas:", error)
+      showAlert("Erro ao carregar tarefas", "error")
+    } finally {
+      setLoading(false)
+    }
+  }, [uid])
+
+  // ➕ Criar tarefa
+  const createTask = async () => {
+    try {
+      const userTasksRef = collection(db, "users", uid, "tasks")
+      const docRef = await addDoc(userTasksRef, {
         title: "",
         status: "pendente",
+      })
+      const snapshot = await getDoc(docRef)
+      const data = snapshot.data()
+
+      if (!data) throw new Error("Erro ao obter dados da nova tarefa")
+
+      const newTask: Task = {
+        id: docRef.id,
+        title: data.title,
+        status: data.status,
         editMode: true,
       }
+
       setTasks((prev) => [...prev, newTask])
       showAlert("Tarefa criada com sucesso!", "success")
     } catch (error) {
       console.error("Erro ao criar tarefa:", error)
+      showAlert("Erro ao criar tarefa", "error")
     }
   }
 
-  const handleEdit = async (id: string, newTitle: string) => {
+  // ✏️ Atualizar tarefa
+  const updateTask = async (task: Task) => {
     try {
-      await updateTask(uid!, id, { title: newTitle })
-      setTasks((prev) =>
-        prev.map((task) =>
-          task.id === id ? { ...task, title: newTitle, editMode: false } : task
-        )
-      )
+      const taskRef = doc(db, "users", uid, "tasks", task.id)
+      await updateDoc(taskRef, {
+        title: task.title,
+        status: task.status,
+      })
+      showAlert("Tarefa atualizada!", "success")
     } catch (error) {
-      console.error("Erro ao editar tarefa:", error)
+      console.error("Erro ao atualizar tarefa:", error)
+      showAlert("Erro ao atualizar tarefa", "error")
     }
   }
 
-  const handleDelete = async (id: string) => {
+  // 🗑️ Excluir tarefa
+  const deleteTask = async (id: string) => {
     try {
-      await deleteTask(uid!, id)
+      const taskRef = doc(db, "users", uid, "tasks", id)
+      await deleteDoc(taskRef)
       setTasks((prev) => prev.filter((task) => task.id !== id))
-      showAlert("Tarefa excluída com sucesso!", "danger")
+      showAlert("Tarefa excluída!", "success")
     } catch (error) {
       console.error("Erro ao excluir tarefa:", error)
+      showAlert("Erro ao excluir tarefa", "error")
     }
   }
 
-  const handleToggleStatus = async (id: string) => {
-    const task = tasks.find((t) => t.id === id)
-    if (!task || !uid) return
-    const novoStatus = task.status === "concluido" ? "pendente" : "concluido"
-    try {
-      await updateTask(uid, id, { status: novoStatus })
-      setTasks((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, status: novoStatus } : t))
-      )
-    } catch (error) {
-      console.error("Erro ao atualizar status:", error)
-    }
-  }
+  useEffect(() => {
+    if (uid) fetchTasks()
+  }, [uid, fetchTasks])
 
-  if (!uid) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-zinc-400">
-        <p>🔒 Faça login para acessar suas tarefas.</p>
-      </div>
-    )
-  }
+  if (loading) return <p>Carregando tarefas...</p>
 
   return (
-    <div className="min-h-screen text-zinc-300">
-      <Navbar onChange={(filtro) => setFilter(filtro)} />
-      <div className="max-w-7xl mx-auto py-8 px-4">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-white">Minhas Tarefas</h2>
-          <Button
-            onClick={handleCreate}
-            className="bg-zinc-600 hover:bg-zinc-700 text-white"
-          >
-            Adicionar Tarefa
-          </Button>
-        </div>
-
-        {filteredTasks.length === 0 ? (
-          <p className="text-center text-zinc-400 mt-10">
-            Nenhuma tarefa encontrada.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {filteredTasks.map((task) => (
-              <Card
-                key={task.id}
-                className="transition-transform duration-300 animate-fade-in bg-zinc-800 text-white"
-              >
-                <TaskItem
-                  task={task}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onToggleStatus={handleToggleStatus}
+    <div>
+      <h2>Minhas Tarefas</h2>
+      <button onClick={createTask}>➕ Nova Tarefa</button>
+      <ul>
+        {tasks.map((task) => (
+          <li key={task.id}>
+            {task.editMode ? (
+              <>
+                <input
+                  value={task.title}
+                  onChange={(e) =>
+                    setTasks((prev) =>
+                      prev.map((t) =>
+                        t.id === task.id ? { ...t, title: e.target.value } : t
+                      )
+                    )
+                  }
                 />
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
+                <select
+                  value={task.status}
+                  onChange={(e) =>
+                    setTasks((prev) =>
+                      prev.map((t) =>
+                        t.id === task.id
+                          ? {
+                              ...t,
+                              status: e.target.value as Task["status"],
+                            }
+                          : t
+                      )
+                    )
+                  }
+                >
+                  <option value="pendente">Pendente</option>
+                  <option value="concluída">Concluída</option>
+                </select>
+                <button
+                  onClick={() => {
+                    updateTask(task)
+                    setTasks((prev) =>
+                      prev.map((t) =>
+                        t.id === task.id ? { ...t, editMode: false } : t
+                      )
+                    )
+                  }}
+                >
+                  💾 Salvar
+                </button>
+              </>
+            ) : (
+              <>
+                <strong>{task.title}</strong> — {task.status}
+                <button
+                  onClick={() =>
+                    setTasks((prev) =>
+                      prev.map((t) =>
+                        t.id === task.id ? { ...t, editMode: true } : t
+                      )
+                    )
+                  }
+                >
+                  ✏️ Editar
+                </button>
+                <button onClick={() => deleteTask(task.id)}>🗑️ Excluir</button>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
