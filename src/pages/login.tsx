@@ -1,37 +1,38 @@
-import { useState, FormEvent } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
-import { auth } from "../../firebase/config";
-import GoogleLoginButton from "../components/googleLoginButton";
-import Input from "../components/input";
-import Button from "../components/button";
-import { showAlert } from "../utils/alert";
+import { useState, FormEvent } from "react"
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { useNavigate } from "react-router-dom"
+import { auth } from "../../firebase/config"
+import GoogleLoginButton from "../components/googleLoginButton"
+import Input from "../components/input"
+import Button from "../components/button"
+import { showAlert } from "../utils/alert"
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [erro, setErro] = useState("");
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [email, setEmail] = useState("")
+  const [senha, setSenha] = useState("")
+  const [erro, setErro] = useState("")
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
-  const podeLogar = email.trim() !== "" && senha.trim() !== "";
+  const podeLogar = email.trim() !== "" && senha.trim() !== ""
 
   const handleLogin = async (e: FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
+    setErro("")
+    setLoading(true)
 
-    setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, senha);
-      showAlert("Login realizado com sucesso!", "success");
-      navigate("/tarefas");
+      await signInWithEmailAndPassword(auth, email, senha)
+      showAlert("Login realizado com sucesso!", "success")
+      navigate("/tarefas")
     } catch (err) {
-      console.error("Erro ao logar:", err);
-      setErro("Email ou senha inválidos.");
-      showAlert("Email ou senha inválidos.", "danger");
+      console.error("Erro ao logar:", err)
+      setErro("Email ou senha inválidos.")
+      showAlert("Email ou senha inválidos.", "danger")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -87,7 +88,7 @@ const Login = () => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

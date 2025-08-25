@@ -1,41 +1,42 @@
-import { signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "../../firebase/config";
-import { useNavigate } from "react-router-dom";
-import Button from "./button";
-import { useState } from "react";
-import { showAlert } from "../utils/alert";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
+import { auth } from "../../firebase/config"
+import { useNavigate } from "react-router-dom"
+import Button from "./button"
+import { showAlert } from "../utils/alert"
+import { FirebaseError } from "firebase/app"
 
 interface Props {
-  disabled?: boolean;
+  disabled?: boolean
 }
 
-const GoogleLoginButton = ({ disabled }: Props) => {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+export default function GoogleLoginButton({ disabled }: Props) {
+  const navigate = useNavigate()
 
   const handleGoogleLogin = async () => {
-    setLoading(true);
     try {
-      await signInWithPopup(auth, googleProvider);
-      showAlert("Login realizado com sucesso!", "success"); 
-      navigate("/tarefas");
-    } catch (err) {
-      console.error("Erro ao logar com Google:", err);
-      showAlert("Erro ao logar com Google.", "danger"); 
-    } finally {
-      setLoading(false);
+      const provider = new GoogleAuthProvider()
+      await signInWithPopup(auth, provider)
+      showAlert("Login com Google realizado com sucesso!", "success")
+      navigate("/tarefas")
+    } catch (error) {
+      const firebaseError = error as FirebaseError
+
+      if (firebaseError.code === "auth/popup-closed-by-user") {
+        showAlert("Login cancelado pelo usuário.", "danger")
+      } else {
+        console.error("Erro ao logar com Google:", firebaseError)
+        showAlert("Erro ao logar com Google.", "danger")
+      }
     }
-  };
+  }
 
   return (
     <Button
-      className="bg-red-600 hover:bg-red-700"
+      className="bg-red-600 hover:bg-red-700 w-full"
       onClick={handleGoogleLogin}
-      disabled={disabled || loading}
+      disabled={disabled}
     >
-      {loading ? "Conectando..." : "Entrar com Google"}
+      Entrar com Google
     </Button>
-  );
-};
-
-export default GoogleLoginButton;
+  )
+}
