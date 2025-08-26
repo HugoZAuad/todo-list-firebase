@@ -4,13 +4,11 @@ import { TaskList } from '../../components/taskList';
 import { Task } from '../../types/tasks';
 import '@testing-library/jest-dom';
 
-// Tipagem do evento de drag
 type DragEndEvent = {
   active: { id: string };
   over: { id: string } | null;
 };
 
-// Extensão da interface global para simular dragEnd
 declare global {
   interface Window {
     __onDragEnd?: (event: DragEndEvent) => void;
