@@ -5,4 +5,5 @@ export interface Task {
   title: string
   status: TaskStatus
   editMode?: boolean
+  order?: number;
 }

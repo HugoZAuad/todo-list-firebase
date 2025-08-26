@@ -20,4 +20,10 @@ export default tseslint.config([
       globals: globals.browser,
     },
   },
+  {
+    files: ['**/setupTests.ts', '**/*.test.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-var-requires': 'off',
+    },
+  },
 ])

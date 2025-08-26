@@ -3,7 +3,7 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["vite/client", "react", "react-dom", "firebase"],
+    "types": ["vite/client", "react", "react-dom", "firebase", "jest", "@testing-library/jest-dom"],
     "module": "ESNext",
     "target": "ESNext",
     "noImplicitAny": false,

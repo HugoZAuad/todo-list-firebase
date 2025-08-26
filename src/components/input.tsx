@@ -22,7 +22,7 @@ const Input = ({
         {...props}
         type={inputType}
         autoComplete="new-password"
-        className="w-full px-4 py-2 border rounded text-zinc-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className={`w-full px-4 py-2 border rounded text-zinc-950 focus:outline-none focus:ring-2 focus:ring-blue-500 ${props.className || ""}`}
         onCopy={secureInput ? (e) => e.preventDefault() : props.onCopy}
         onPaste={secureInput ? (e) => e.preventDefault() : props.onPaste}
         onCut={secureInput ? (e) => e.preventDefault() : props.onCut}

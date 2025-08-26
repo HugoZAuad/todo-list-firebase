@@ -45,7 +45,7 @@ export const TaskItem: React.FC<Props> = ({
   }
 
   return (
-    <div
+    <div data-testid="task-item"
       className={`relative flex flex-col gap-4 transition-all duration-300 task-item p-4 rounded bg-zinc-800 ${
         task.status === "Concluido" ? "concluido" : ""
       } ${isDragging ? "dragging" : ""}`}

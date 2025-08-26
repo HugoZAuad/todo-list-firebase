@@ -93,7 +93,6 @@ export const TaskList: React.FC<Props> = ({
 
       const reorderedTasks = arrayMove(items, oldIndex, newIndex)
       
-      // Atualizar a ordem no Firebase para cada task
       reorderedTasks.forEach(async (task, index) => {
         if (task.order !== index) {
           try {

@@ -3,7 +3,14 @@
   "compilerOptions": {
     "moduleResolution": "node16",
     "module": "Node16",
-    "types": ["vite/client", "react", "react-dom", "firebase"]
+    "types": [
+      "vite/client",
+      "react",
+      "react-dom",
+      "firebase",
+      "jest",
+      "@testing-library/jest-dom"
+    ]
   },
   "include": ["vite.config.ts"]
 }
