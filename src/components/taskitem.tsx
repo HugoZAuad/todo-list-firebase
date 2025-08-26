@@ -21,7 +21,7 @@ export const TaskItem: React.FC<Props> = ({
 }) => {
   return (
     <div
-      className={`flex items-center gap-4 transition-all duration-300 ${
+      className={`flex items-center gap-4 transition-all duration-300 task-item ${
         task.status === "Concluido" ? "concluido" : ""
       } ${isDragging ? "dragging" : ""}`}
     >

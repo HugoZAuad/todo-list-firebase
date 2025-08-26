@@ -115,7 +115,7 @@ const Register = () => {
         <div className="mt-4 text-center">
           <p>
             Já tem uma conta?{" "}
-            <a href="/login" className="text-blue-950 hover:text-blue-500">
+            <a href="/login" className="text-amber-400 hover:text-amber-600">
               Entrar
             </a>
           </p>

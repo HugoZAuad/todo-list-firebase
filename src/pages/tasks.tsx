@@ -111,7 +111,7 @@ export default function Tasks() {
           <h2 className="text-xl font-bold text-zinc-500">Minhas Tarefas</h2>
           <Button
             onClick={handleCreate}
-            className="bg-zinc-600 hover:bg-zinc-700 text-white"
+            className="bg-zinc-600 hover:bg-zinc-700 text-white add-task-button"
           >
             Adicionar Tarefa
           </Button>
