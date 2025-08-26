@@ -18,7 +18,7 @@ export default {
           info: "#3B82F6",
         },
         light: {
-          bg: "#F1F5F9",
+          bg: "#D4D4D8",
           surface: "#F8FAFC",
           text: "#1F2937",
           muted: "#6B7280",
