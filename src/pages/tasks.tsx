@@ -108,7 +108,7 @@ export default function Tasks() {
       <Navbar onChange={(filtro) => setFilter(filtro)} />
       <div className="max-w-7xl mx-auto py-8 px-4">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-white">Minhas Tarefas</h2>
+          <h2 className="text-xl font-bold text-zinc-500">Minhas Tarefas</h2>
           <Button
             onClick={handleCreate}
             className="bg-zinc-600 hover:bg-zinc-700 text-white"

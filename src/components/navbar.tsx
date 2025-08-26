@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { useSession } from "../hooks/useSessions"
+import { useTheme } from "../hooks/useTheme"
 import Button from "./button"
+import { FiSun, FiMoon } from "react-icons/fi"
 
 interface Tab {
   label: string
@@ -19,6 +21,7 @@ interface NavbarProps {
 
 export default function Navbar({ onChange }: NavbarProps) {
   const { user, logout, loading } = useSession()
+  const { theme, toggleTheme } = useTheme()
   const [activeTab, setActiveTab] = useState("todos")
 
   const handleClick = (value: string) => {
@@ -45,10 +48,17 @@ export default function Navbar({ onChange }: NavbarProps) {
           </button>
         ))}
       </div>
-
-      <Button className="bg-red-600 hover:bg-red-700" onClick={logout}>
-        Logout
-      </Button>
+      <div className="flex items-center gap-4">
+        <Button
+          className="bg-zinc-600 hover:bg-zinc-700 flex items-center gap-2"
+          onClick={toggleTheme}
+        >
+          {theme === "dark" ? <FiSun size={18} /> : <FiMoon size={18} />}
+        </Button>
+        <Button className="bg-red-600 hover:bg-red-700" onClick={logout}>
+          Logout
+        </Button>
+      </div>
     </nav>
   )
 }
