@@ -15,6 +15,8 @@ Uma aplicação web moderna de lista de tarefas com autenticação de usuários,
   - react-joyride (Sistema de Tour)
   - react-router-dom (Roteamento)
   - react-hot-toast (Notificações)
+  - Jest (Testes Unitarios)
+  - Cypress (Testes de Integração)
 
 ## 📋 Funcionalidades
 
@@ -44,45 +46,6 @@ Uma aplicação web moderna de lista de tarefas com autenticação de usuários,
 
 ## 🏗️ Arquitetura e Estrutura Detalhada
 
-### Estrutura do Projeto
-
-```
-src/
-├── components/          # Componentes React reutilizáveis
-│   ├── alertManager.tsx        # Gerenciamento de alertas e notificações
-│   ├── button.tsx              # Componente de botão estilizável
-│   ├── card.tsx                # Container para exibir conteúdo em cards
-│   ├── googleLoginButton.tsx   # Botão de login com Google OAuth
-│   ├── input.tsx               # Componente de input com validação
-│   ├── loadingSpinner.tsx      # Indicador visual de carregamento
-│   ├── navbar.tsx              # Barra de navegação principal
-│   ├── taskitem.tsx            # Item individual de tarefa (CRUD)
-│   ├── taskList.tsx            # Lista com drag-and-drop (@dnd-kit)
-│   └── Tour.tsx                # Sistema de tour guiado (react-joyride)
-├── hooks/              # Custom hooks para lógica reutilizável
-│   ├── useAlert.ts     # Gerenciamento de alertas toast
-│   ├── useSessions.ts  # Autenticação e sessão do usuário
-│   └── useTheme.ts     # Toggle entre temas claro/escuro
-├── pages/              # Páginas principais da aplicação
-│   ├── login.tsx       # Página de autenticação
-│   ├── register.tsx    # Página de cadastro
-│   └── tasks.tsx       # Página principal de gerenciamento
-├── services/           # Serviços para comunicação externa
-│   └── taskService.ts  # Operações CRUD no Firebase Firestore
-├── styles/             # Arquivos de estilização
-│   ├── global.css      # Estilos globais e variáveis CSS
-│   ├── taskitem.css    # Estilos específicos para itens
-│   └── tasklist.css    # Estilos para lista e drag-and-drop
-├── types/              # Definições TypeScript
-│   └── tasks.ts        # Interfaces e tipos para tarefas
-├── utils/              # Utilitários e funções auxiliares
-│   └── alert.ts        # Sistema de exibição de alertas
-└── tests/              # Testes automatizados
-    ├── components/     # Testes unitários de componentes
-    ├── integration/    # Testes de integração de fluxos
-    └── __mocks__/      # Mocks para dependências externas
-```
-
 ### 🔧 Componentes Detalhados
 
 #### Gerenciamento de Estado
@@ -107,50 +70,23 @@ src/
 - **Testes de Integração**: Verificação de fluxos completos de usuário
 - **Testes de UI**: Interações e comportamentos visuais
 
-### Estrutura de Testes
-
-```
-src/tests/
-├── components/              # Testes unitários de componentes
-│   ├── alertManager.test.tsx    # Testes de gerenciamento de alertas
-│   ├── button.test.tsx          # Testes de interação de botões
-│   ├── card.test.tsx            # Testes de renderização de cards
-│   ├── googleLoginButton.test.tsx # Testes de autenticação Google
-│   ├── input.test.tsx           # Testes de validação de inputs
-│   ├── loadingSpinner.test.tsx  # Testes de estados de carregamento
-│   ├── navbar.test.tsx          # Testes de navegação
-│   ├── taskitem.test.tsx        # Testes de CRUD de tarefas
-│   ├── taskList.test.tsx        # Testes de drag-and-drop
-│   └── tour.test.tsx            # Testes do sistema de tour
-├── integration/             # Testes de integração
-│   ├── login.test.tsx      # Fluxo completo de autenticação
-│   └── (outros testes de integração)
-└── __mocks__/              # Mocks para testes
-    └── firebase/
-        └── config.ts       # Mock da configuração do Firebase
-```
-
 ### Executando os Testes
 
 ```bash
-# Executar todos os testes
+# Executar todos os testes unitarios
 npm test
-
-# Executar testes com cobertura detalhada
-npm run test:coverage
-
-# Executar testes em modo watch para desenvolvimento
-npm run test:watch
 
 # Executar testes específicos
 npm test src/tests/components/taskList.test.tsx
-npm test src/tests/integration/login.test.tsx
+
+# Executa testes de integração
+npx cypress open
+
 ```
 
 ### Tecnologias de Teste
 - **Jest**: Framework de testes com suporte a TypeScript
-- **React Testing Library**: Testes focados em comportamento do usuário
-- **Mocking**: Isolamento de dependências externas (Firebase)
+- **Cypress**: Testes focados em comportamento do usuário
 - **Coverage Reporting**: Relatórios detalhados de cobertura de código
 
 ## 🛠️ Como Executar o Projeto
@@ -219,8 +155,6 @@ npm run preview
 | `npm run preview` | Preview local do build |
 | `npm run lint` | Análise estática com ESLint |
 | `npm test` | Executa suite completa de testes |
-| `npm run test:coverage` | Testes com relatório de cobertura |
-| `npm run test:watch` | Modo watch para desenvolvimento |
 
 ## 🎯 Diferenciais Técnicos
 
