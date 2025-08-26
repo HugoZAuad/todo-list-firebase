@@ -24,10 +24,13 @@ export const TaskItem: React.FC<Props> = ({
   const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
-    if (task.editMode && !isEditing) {
+    if (task.editMode) {
       setIsEditing(true)
       onEdit(task.id, task.title, false) 
+    } else {
+      setIsEditing(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [task.editMode])
 
   const handleSave = () => {
@@ -70,7 +73,10 @@ export const TaskItem: React.FC<Props> = ({
 
           <button
             onClick={() => {
-              if (task.status !== "Concluido") setIsEditing(true)
+              if (task.status !== "Concluido") {
+                setIsEditing(true)
+                onEdit(task.id, task.title, false)
+              }
             }}
             className={`px-2 py-1 rounded text-sm ${
               task.status === "Concluido"

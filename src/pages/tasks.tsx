@@ -64,7 +64,7 @@ export default function Tasks() {
         await updateTask(uid!, id, { title: newTitle })
         setTasks((prev) =>
           prev.map((task) =>
-            task.id === id ? { ...task, title: newTitle } : task
+            task.id === id ? { ...task, title: newTitle, editMode: false } : task
           )
         )
         showAlert("Tarefa editada com sucesso!", "success")
@@ -93,11 +93,11 @@ export default function Tasks() {
   const handleToggleStatus = async (id: string) => {
     const task = tasks.find((t) => t.id === id)
     if (!task || !uid) return
-    const novoStatus = task.status === "Concluido" ? "Pendente" : "Concluido"
+      const novoStatus = task.status === "Concluido" ? "Pendente" : "Concluido";
     try {
       await updateTask(uid, id, { status: novoStatus })
       setTasks((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, status: novoStatus } : t))
+        prev.map((t) => (t.id === id ? { ...t, status: novoStatus, editMode: false } : t))
       )
     } catch (error) {
       console.error("Erro ao atualizar status:", error)
