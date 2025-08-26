@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "moduleResolution": "node16",
-    "module": "Node16",
-    "types": ["vite/client", "react", "react-dom", "firebase"]
-  },
-  "include": ["vite.config.ts"]
-}
