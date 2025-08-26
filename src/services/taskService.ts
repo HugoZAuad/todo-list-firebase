@@ -12,19 +12,25 @@ import {
 export type Task = {
   id: string
   title: string
-  status: "pendente" | "concluido" | "excluido"
+  status: "Pendente" | "Concluido" | "Excluido"
   uid?: string
   editMode?: boolean
+  order?: number
 }
 
 export const createTask = async (
   uid: string,
-  task: { title: string; status: "pendente" | "concluido" }
+  task: { title: string; status: "Pendente" | "Concluido" }
 ): Promise<DocumentReference> => {
   const userTasksRef = collection(db, "users", uid, "tasks")
+  
+  const snapshot = await getDocs(userTasksRef)
+  const order = snapshot.size
+  
   const docRef = await addDoc(userTasksRef, {
     ...task,
     uid,
+    order,
   })
   return docRef
 }
@@ -36,7 +42,8 @@ export const getTasks = async (uid: string): Promise<Task[]> => {
     id: doc.id,
     ...(doc.data() as Omit<Task, "id">),
   }))
-  return tasks
+  
+  return tasks.sort((a, b) => (a.order || 0) - (b.order || 0))
 }
 
 export const updateTask = async (

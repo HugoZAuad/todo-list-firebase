@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react"
 import Navbar from "../components/navbar"
-import { Card } from "../components/card"
 import Button from "../components/button"
-import { TaskItem } from "../components/taskitem"
+import { TaskList } from "../components/taskList"
 import { showAlert } from "../utils/alert"
 import { auth } from "../../firebase/config"
 import {
@@ -38,18 +37,18 @@ export default function Tasks() {
   }, [])
 
   const filteredTasks = tasks.filter((task) => {
-    if (filter === "todos") return task.status !== "excluido"
+    if (filter === "todos") return task.status !== "Excluido"
     return task.status === filter
   })
 
   const handleCreate = async () => {
     if (!uid) return
     try {
-      const doc = await createTask(uid, { title: "", status: "pendente" })
+      const doc = await createTask(uid, { title: "", status: "Pendente" })
       const newTask: Task = {
         id: doc.id,
         title: "",
-        status: "pendente",
+        status: "Pendente",
         editMode: true,
       }
       setTasks((prev) => [...prev, newTask])
@@ -85,7 +84,7 @@ export default function Tasks() {
   const handleToggleStatus = async (id: string) => {
     const task = tasks.find((t) => t.id === id)
     if (!task || !uid) return
-    const novoStatus = task.status === "concluido" ? "pendente" : "concluido"
+    const novoStatus = task.status === "Concluido" ? "Pendente" : "Concluido"
     try {
       await updateTask(uid, id, { status: novoStatus })
       setTasks((prev) =>
@@ -123,21 +122,14 @@ export default function Tasks() {
             Nenhuma tarefa encontrada.
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {filteredTasks.map((task) => (
-              <Card
-                key={task.id}
-                className="transition-transform duration-300 animate-fade-in bg-zinc-800 text-white"
-              >
-                <TaskItem
-                  task={task}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onToggleStatus={handleToggleStatus}
-                />
-              </Card>
-            ))}
-          </div>
+        <TaskList
+          tasks={filteredTasks}
+          setTasks={setTasks}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onToggleStatus={handleToggleStatus}
+          uid={uid}
+        />
         )}
       </div>
     </div>

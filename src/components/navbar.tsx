@@ -9,8 +9,8 @@ interface Tab {
 
 const tabs: Tab[] = [
   { label: "Todos", value: "todos" },
-  { label: "Pendentes", value: "pendente" },
-  { label: "Concluídos", value: "concluido" },
+  { label: "Pendentes", value: "Pendente" },
+  { label: "Concluídos", value: "Concluido" },
 ]
 
 interface NavbarProps {

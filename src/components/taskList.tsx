@@ -1,105 +1,132 @@
-import React, { useEffect, useState } from "react"
-import {
-  createTask,
-  getTasks,
-  updateTask,
-  deleteTask,
-  Task,
-} from "../services/taskService"
+import React from "react"
+import { Task, updateTask } from "../services/taskService"
 import { TaskItem } from "./taskitem"
+import { Card } from "./card"
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable'
+import {
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 type Props = {
-  uid: string
+  tasks: Task[]
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>
+  onEdit: (id: string, title: string) => void
+  onDelete: (id: string) => void
+  onToggleStatus: (id: string) => void
+  uid: string | null
 }
 
-const TaskList: React.FC<Props> = ({ uid }) => {
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [newTitle, setNewTitle] = useState("")
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const data = await getTasks(uid)
-        setTasks(data || [])
-      } catch (error) {
-        console.error("Erro ao buscar tarefas:", error)
-      }
-    }
-    fetchTasks()
-  }, [uid])
-
-  const handleCreate = async () => {
-    if (!newTitle.trim()) return
-    try {
-      const docRef = await createTask(uid, {
-        title: newTitle,
-        status: "pendente",
-      })
-      const newTask: Task = {
-        id: docRef.id,
-        title: newTitle,
-        status: "pendente",
-      }
-      setTasks((prev) => [...prev, newTask])
-      setNewTitle("")
-    } catch (error) {
-      console.error("Erro ao criar tarefa:", error)
-    }
-  }
-
-  const handleEdit = async (id: string, title: string) => {
-    try {
-      await updateTask(uid, id, { title })
-      setTasks((prev) =>
-        prev.map((task) => (task.id === id ? { ...task, title } : task))
-      )
-    } catch (error) {
-      console.error("Erro ao editar tarefa:", error)
-    }
-  }
-
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteTask(uid, id)
-      setTasks((prev) => prev.filter((task) => task.id !== id))
-    } catch (error) {
-      console.error("Erro ao deletar tarefa:", error)
-    }
+function SortableTask({ task, onEdit, onDelete, onToggleStatus }: {
+  task: Task
+  onEdit: (id: string, title: string) => void
+  onDelete: (id: string) => void
+  onToggleStatus: (id: string) => void
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task.id })
+  
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
   }
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-5 bg-gray-100 rounded shadow">
-      <h2 className="text-2xl font-bold mb-4 text-center">Minhas Tarefas</h2>
-
-      <div className="flex mb-4">
-        <input
-          type="text"
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          placeholder="Nova tarefa"
-          className="flex-grow px-3 py-2 border rounded-l focus:outline-none focus:ring-2 focus:ring-blue-400"
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <Card>
+        <TaskItem
+          task={task}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onToggleStatus={onToggleStatus}
+          isDragging={isDragging}
+          dragHandleProps={listeners}
         />
-        <button
-          onClick={handleCreate}
-          className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600"
-        >
-          Criar
-        </button>
-      </div>
-
-      <ul>
-        {tasks.map((task) => (
-          <TaskItem
-            key={task.id}
-            task={task}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onToggleStatus={() => {}}
-          />
-        ))}
-      </ul>
+      </Card>
     </div>
   )
 }
 
-export default TaskList
+export const TaskList: React.FC<Props> = ({
+  tasks,
+  setTasks,
+  onEdit,
+  onDelete,
+  onToggleStatus,
+  uid,
+}) => {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id || !uid) return
+
+    setTasks((items) => {
+      const oldIndex = items.findIndex((item) => item.id === active.id)
+      const newIndex = items.findIndex((item) => item.id === over.id)
+
+      const reorderedTasks = arrayMove(items, oldIndex, newIndex)
+      
+      // Atualizar a ordem no Firebase para cada task
+      reorderedTasks.forEach(async (task, index) => {
+        if (task.order !== index) {
+          try {
+            await updateTask(uid, task.id, { order: index })
+          } catch (error) {
+            console.error('Erro ao atualizar ordem da task:', error)
+          }
+        }
+      })
+
+      return reorderedTasks
+    })
+  }
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={tasks} strategy={rectSortingStrategy}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {tasks.map((task) => (
+            <SortableTask
+              key={task.id}
+              task={task}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onToggleStatus={onToggleStatus}
+            />
+          ))}
+        </div>
+      </SortableContext>
+    </DndContext>
+  )
+}
