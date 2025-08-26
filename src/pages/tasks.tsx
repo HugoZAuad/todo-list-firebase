@@ -58,16 +58,25 @@ export default function Tasks() {
     }
   }
 
-  const handleEdit = async (id: string, newTitle: string) => {
-    try {
-      await updateTask(uid!, id, { title: newTitle })
+  const handleEdit = async (id: string, newTitle: string, save: boolean = false) => {
+    if (save) {
+      try {
+        await updateTask(uid!, id, { title: newTitle })
+        setTasks((prev) =>
+          prev.map((task) =>
+            task.id === id ? { ...task, title: newTitle } : task
+          )
+        )
+        showAlert("Tarefa editada com sucesso!", "success")
+      } catch {
+        showAlert("Erro ao editar tarefa!", "danger")
+      }
+    } else {
       setTasks((prev) =>
         prev.map((task) =>
-          task.id === id ? { ...task, title: newTitle, editMode: false } : task
+          task.id === id ? { ...task, title: newTitle } : task
         )
       )
-    } catch (error) {
-      console.error("Erro ao editar tarefa:", error)
     }
   }
 

@@ -25,7 +25,7 @@ import { CSS } from '@dnd-kit/utilities'
 type Props = {
   tasks: Task[]
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>
-  onEdit: (id: string, title: string) => void
+  onEdit: (id: string, title: string, save?: boolean) => void
   onDelete: (id: string) => void
   onToggleStatus: (id: string) => void
   uid: string | null
@@ -33,7 +33,7 @@ type Props = {
 
 function SortableTask({ task, onEdit, onDelete, onToggleStatus }: {
   task: Task
-  onEdit: (id: string, title: string) => void
+  onEdit: (id: string, title: string, save?: boolean) => void
   onDelete: (id: string) => void
   onToggleStatus: (id: string) => void
 }) {
